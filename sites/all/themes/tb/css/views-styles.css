@@ -1,0 +1,26 @@
+/* $Id: views-styles.css,v 1.1 2009/08/12 04:25:15 johnalbin Exp $ */
+
+/**
+ * @file
+ * Views Styling
+ */
+
+.views-row {
+  margin: 17px 0px 0 0;
+}
+
+.views-field-title {
+/*  display: block;*/
+  overflow: hidden;
+  /*white-space: nowrap;*/
+  /* width: 200px; */
+  text-overflow: ellipsis-word;
+}
+
+.view-id-Resources .views-field-title {
+  width: 100%;
+}
+
+td.views-field-created {
+  width: 20%;
+}

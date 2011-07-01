@@ -1,0 +1,502 @@
+<?php
+// $Id:
+
+/**
+ * @file
+ * transistion belsize helper module
+ */
+
+function transition_menu_alter(&$items) {
+	$items['node/%og_forum_group_type/og/forum']['weight'] = 0.2;
+
+  // unset 'Invitations' tab on event page
+  // setting this as menu_callback and not MENU_LOCAL_TASK doing the job :)
+  $items['node/%node/rsvp']['type'] = MENU_CALLBACK;
+}
+
+/**
+ * Implementatation of hook_menu().
+ */
+function transition_menu() {
+  $items['node/%node/attend'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Attend this event',
+    'page callback' => '_attend_event',
+    'page arguments' => array(1),
+    'access callback' => TRUE
+  );
+  
+  $items['node/%node/unsubscribe'] = array(
+    'type' => MENU_CALLBACK,
+    'title' => 'Attend this event',
+    'page callback' => '_unsubscribe_event',
+    'page arguments' => array(1),
+    'access callback' => TRUE
+  );
+  
+  // og gallery (filter)
+  $items['node/%node/og/galleries'] = array(
+    'title' => 'Photos',
+    'page callback' => 'galleries_page',
+    'page arguments' => array(1),
+    'access callback' => '_access_galleries',
+   	'access arguments' => array(1),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 3
+  );
+  
+  // og events (filter)
+  $items['node/%node/og/events'] = array(
+    'title' => 'Events',
+    'page callback' => 'events_page',
+    'page arguments' => array(1),
+    'access callback' => '_access_galleries',
+   	'access arguments' => array(1),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 3	
+  );
+
+  // og news (filter)
+  $items['node/%node/og/news'] = array(
+    'title' => 'News',
+    'page callback' => 'news_page',
+    'page arguments' => array(1),
+    'access callback' => '_access_galleries',
+   	'access arguments' => array(1),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 3
+  );
+
+	// show all attendees for current (node id) event
+  $items['node/%node/all-attendees'] = array(
+    'title' => 'All attendees',
+    'page callback' => 'all_attendees_page',
+    'page arguments' => array(1),
+    'access callback' => '_access_all_attendees',
+   	'access arguments' => array(1),
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 4
+  );
+
+  return $items;
+}
+
+function galleries_page($ognode) {
+	return general_page($ognode, 'gallery');
+}
+
+function events_page($ognode) {
+	return general_page($ognode, 'event');	
+}
+
+function news_page($ognode) {
+	return general_page($ognode, 'news');	
+}
+
+function general_page($ognode, $type) {
+	$sql = "SELECT * FROM {og_ancestry} WHERE group_nid = %d";
+	$result = db_query($sql, $ognode->nid);
+	$no_results = TRUE;
+	while ($data = db_fetch_object($result)) {
+	  $node = node_load($data->nid);
+	  if($node->type == $type) {
+	  	$results .= node_view($node, TRUE, FALSE); 
+	  	if($no_results) {
+	  		$no_results = FALSE;
+	  	}
+	  }
+	}
+	
+	return $no_results ? 'This group doesn\'t have any '. $type . ' content.' : $results;
+}
+
+function all_attendees_page($node) {
+	return _list_of_attendees($node, TRUE);
+}
+
+function _access_all_attendees($node) {
+	return $node->type == 'event' ? TRUE : FALSE;
+}
+
+function _access_galleries($node) {
+	if($node->type == 'group') {
+		return TRUE;		
+	}	else {
+		return FALSE;		
+	}	
+}
+
+
+function _attend_event($node) {
+	_attend($node, 'yes');
+}
+
+function _unsubscribe_event($node) {
+	_attend($node, 'no');
+}
+
+function _attend($node, $response) {
+	global $user;
+	$respond_ok = t('Your response has been saved.');
+	$respond_bad = t('Something has gone wrong please try again later.');	
+
+	// if we have invitations for current node/event
+	// $rid = rsvp ID (invitation ID)
+	if($rid = _get_rid($node->nid)) {
+
+		$hash = db_result(db_query('SELECT hash FROM {rsvp_invite} WHERE rid = %d AND uid = %d', $rid, $user->uid));
+		// if current user have entry in current invitation
+		if($hash) {
+			$sql = 'UPDATE {rsvp_invite} ' .
+					'		SET response = \'%s\', timestamp = %d, invited = 1, received = 1 ' .
+					'   WHERE hash = \'%s\'';
+		  if(db_query($sql, $response, time(), $hash)) {
+		  	drupal_set_message($respond_ok);	
+		  } else {
+		  	drupal_set_message($respond_bad);
+		  }
+		} else { // .. else create entry for user in current invitation
+			_attend_create_user_invitation($rid, $respond_ok, $respond_bad);
+
+		}
+	} else { // ... if we don't have invitation for current event
+		if($rid = _create_event_invitation($node->nid, $node->title, $node->field_date[0]['value'])) {
+			_attend_create_user_invitation($rid, $respond_ok, $respond_bad);
+		}		
+	}
+
+	drupal_goto('node/'. $node->nid);	
+}
+
+function _attend_create_user_invitation($rid, $respond_ok, $respond_bad) {
+	$hash = md5($rid . 'transition' . time());
+	if(_create_user_invitation($hash, $rid)) {
+		drupal_set_message($respond_ok);
+	} else {
+		drupal_set_message($respond_bad, 'warning');				
+	}	
+}
+
+function _create_user_invitation($hash, $rid) {
+	global $user;
+	
+	$response = 'yes';
+	$uid = $user->uid; 	
+	$email = $user->mail;
+	$invited = 1;
+	$received = 0;
+	$timestamp = time();
+	$comment = '';
+	$inviteehash = '';
+	$totalguests = 1;
+	
+	$values =                             "'%s',  %d,  %d,  '%s', '%s',      %d,       %d,        %d,    '%s',        '%s',          %d";
+	$sql = 'INSERT INTO {rsvp_invite} (response, rid, uid, email, hash, invited, received, timestamp, comment, inviteehash, totalguests) VALUES ('. $values .')';
+	$result = db_query($sql,          $response,$rid,$uid,$email,$hash,$invited,$received,$timestamp,$comment,$inviteehash,$totalguests);
+	
+	return $result;
+}
+
+/**
+ * create entry in rsvp_invite table (create invitation)
+ */ 
+function _create_event_invitation($nid, $name, $startdate) {
+	$rsvp = new stdClass;
+
+  // decimal
+  $rsvp->nid = $nid;
+  $rsvp->uid_moderator = 0;
+  $rsvp->reply_startdate = 0;
+  $rsvp->reply_enddate = 0;
+  $rsvp->max_guests = 0;
+  $rsvp->option_enabled = 0;
+  $rsvp->invite_filterformat = 1;
+  $rsvp->response_blind = 1;
+    
+  // strings
+  $rsvp->name = $name;
+  $rsvp->startdate = $startdate;
+  $rsvp->theme = 'default';
+  $rsvp->stylesheet = 'default';
+  $rsvp->iconset = 'flags';
+  $rsvp->backgroundimage = '-none-';
+  $rsvp->image = '-none-';
+  $rsvp->rsvp_view_roles = '';
+  $rsvp->response_view_roles = '4;2;3;5';
+  $rsvp->invite_text = '';
+  $rsvp->response_blind_node = 0;
+  $rsvp->reply_blind_node = 1;
+  $rsvp->attendees_visible = 0;
+  $rsvp->list_email = 0;
+  $rsvp->allow_invite = 0;
+  $rsvp->text_whoiscoming = 'Responses';
+  $rsvp->text_yes = 'Attend';
+  $rsvp->text_no = 'Attend not';
+  $rsvp->text_maybe = 'Undecided';
+  
+	return rsvp_function_create_rsvp($rsvp);
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ *
+ */
+function transition_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    // Now we need to take care of loading one of the extended nodes from the
+    // database. An array containing our extra field needs to be returned.
+    case 'load':
+//    	if($node->type == 'event') {
+//      	return array('transition_field' => 'extra information transistion');    		
+//    	}
+      break;
+
+    // Insert is called after the node has been validated and saved to the
+    // database. It gives us a chance to create our own record in the database.
+    case 'insert':
+      break;
+
+    // Update is called when an existing node has been changed. Here, we use a
+    // DELETE then an INSERT rather than an UPDATE. The reason is that a node
+    // created before this module was installed won't already have a rating
+    // saved so there would be nothing to update.
+    case 'update':
+      break;
+
+    // Delete is called whn the node is being deleted, it gives us a chance
+    // to delete the rating too.
+    case 'delete':
+      break;
+
+    case 'view':
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_theme().
+ *
+ * This lets us tell Drupal about our theme functions and their arguments.
+ */
+//function transition_theme() {
+//  return array(
+//    'nodeapi_example_rating' => array(
+//      'arguments' => array('rating'),
+//    ),
+//  );
+//}
+
+/**
+ * A custom theme function.
+ *
+ * By using this function to format our rating, themes can override this presentation
+ * if they wish; for example, they could provide a star graphic for the rating. We
+ * also wrap the default presentation in a CSS class that is prefixed by the module
+ * name. This way, style sheets can modify the output without requiring theme code.
+ */
+//function theme_transition($rating) {
+//  $options = array(
+//    0 => t('Unrated'),
+//    1 => t('Poor'),
+//    2 => t('Needs improvement'),
+//    3 => t('Acceptable'),
+//    4 => t('Good'),
+//    5 => t('Excellent'));
+//  $output = '<div class="nodeapi_example_rating">';
+//  $output .= t('Rating: %rating', array('%rating' => $options[(int) $rating]));
+//  $output .= '</div>';
+//  return $output;
+//}
+
+/**
+ * Implementation of hook_block().
+ *
+ * This hook both declares to Drupal what blocks are provided by the module, and
+ * generates the contents of the blocks themselves.
+ */
+function transition_block($op = 'list', $delta = '', $edit = array()) {
+  // The $op parameter determines what piece of information is being requested.
+  switch ($op) {
+    case 'list':
+      $blocks['attendees'] = array(
+        'info'       => t('Attendees (transition)')
+      );
+      return $blocks;
+
+    case 'view':
+      // If $op is "view", then we need to generate the block for display
+      // purposes. The $delta parameter tells us which block is being requested.
+      switch ($delta) {
+        case 'attendees':
+          $block['subject'] = t('Attending:');
+          $block['content'] = _list_of_attendees();
+          break;
+      }
+      return $block;
+  }
+}
+
+
+function _list_of_attendees($node = NULL, $full_list = FALSE) {
+	// how many in allowed (max)..
+	if(empty($node)) {
+		$node = node_load(arg(1));
+	}
+	
+	if($node->type == 'event' && $node->field_max_attendees[0]['value']) {
+		$max_attendees = $node->field_max_attendees[0]['value'];
+	} else {
+		$max_attendees = variable_get('rsvp_default_max_guests', 11);
+	}
+	// .. and how many attendees are now
+	$current_nid = arg(1);
+	$attendees = get_attendees($current_nid);
+
+	$num_attendees = is_array($attendees) ? count($attendees) : 0;
+	
+	$output .= "<div class='attendees-count'>{$num_attendees}/max {$max_attendees}</div>";
+	
+	// limit how many attedees shoud show in the block
+	$limit_to_show  = 3;
+	
+	if(count($attendees) > $limit_to_show && !$full_list) {
+		$attendees = array_slice($attendees, 0, $limit_to_show);
+		$see_all = l('see all attnedees >>', "node/{$node->nid}/all-attendees");
+	}
+		
+	if(is_array($attendees)) {
+		$output .= theme('item_list', $attendees);
+		if($see_all) {
+			$output .= $see_all;
+		}
+	} else {
+		$output .= "<p>{$attendees}</p>";
+	}
+	
+	return $output;
+}
+
+function get_attendees($current_nid) {
+	$attendees_uids = get_attendees_uids($current_nid);
+
+	if(empty($attendees_uids)) {
+		return t('No one attended yet');
+	} else {
+		foreach($attendees_uids as $key => $auid) {
+			$auser = user_load($auid);
+			$picture = theme('user_picture', $auser);
+			$attendees[] = $picture. l($auser->name, 'user/'.$auid, array('attributes' => array('class' => 'user-name')));
+		}		
+	}
+	
+	return $attendees;
+}
+
+/**
+ * grab all attendees users ID's
+ * 
+ * @param $current_nid
+ *   current node ID
+ * 
+ * @return
+ * 	 array of attendees uid's for this event
+ */
+function get_attendees_uids($current_nid) {
+	$rid = _get_rid($current_nid);
+	
+	if($rid) {
+		$sql = "SELECT uid FROM {rsvp_invite} WHERE rid = %d AND response = '%s'";
+		$result = db_query($sql, $rid, 'yes');
+		while ($data = db_fetch_object($result)) {
+		  $attendees_uids[] = $data->uid;
+		}
+		
+		return $attendees_uids;
+	}
+}
+
+/**
+ * get current RSVP ID
+ * 
+ * @return
+ * 	 RSVP ID number
+ */
+function _get_rid($current_nid) {
+	return db_result(db_query('SELECT rid FROM {rsvp} WHERE nid = %d', $current_nid));
+}
+
+///////////////////////////////////////////
+// image for group
+function transition_preprocess_og_mission(&$variables) {
+	if($variables['form']['#node']->type == 'group') {
+		if($variables['form']['#node']->field_image[0]['filepath']) {
+			$path = $variables['form']['#node']->field_image[0]['filepath'];
+			$image = theme('imagecache', 'event_thumb', $path, $alt = '', $title = '', $attributes = NULL, $getsize = TRUE);
+			$variables['image'] = $image;			
+		}
+		$m = user_load($variables['form']['#node']->uid);
+		$variables['manager'] = l($m->name, 'user/'.$m->uid);
+    $variables['members'] = _get_og_mission_members_count($variables['form']['#node']->nid);
+	  $variables['mission'] = $variables['form']['#value'];		
+	}
+}
+
+function _get_og_mission_members_count($og_nid) {
+	$sql = "SELECT 
+(
+SELECT COUNT(*)
+FROM og_uid ou
+INNER JOIN users u ON ou.uid = u.uid
+WHERE ou.nid = og.nid AND u.status > 0 AND ou.is_active >= 1 AND ou.is_admin >= 0
+)
+AS member_count
+FROM {node} {node}
+LEFT JOIN og og ON node.nid = og.nid
+WHERE (node.status <> 0) AND (node.type IN ('group')) AND (og.og_directory <> 0) AND (node.nid = %d)";
+  $member_count = db_result(db_query($sql, $og_nid));
+
+	return isset($member_count) ? $member_count : '?';
+}
+
+/**
+ * template_preprocess_user_picture overwrite
+ * 
+ * @return html
+ *   themed user picture
+ */
+function transition_preprocess_user_picture(&$variables) {
+  $variables['picture'] = '';
+  if (variable_get('user_pictures', 0)) {
+    $account = $variables['account'];
+    if (!empty($account->picture) && file_exists($account->picture)) {
+      $picture = $account->picture;
+    }
+    else if (variable_get('user_picture_default', '')) {
+      $picture = variable_get('user_picture_default', '');
+    } else {
+    	$picture = drupal_get_path('theme', 'tb'). '/images/default-profile.png';
+    }
+
+    if (isset($picture)) {
+      $alt = t("@user's picture", array('@user' => $account->name ? $account->name : variable_get('anonymous', t('Anonymous'))));
+      $presetname = 'user_picture';
+      $path = $picture;
+      $variables['picture'] = theme('imagecache', $presetname, $path, $alt = '', $title = '', $attributes = NULL);
+      if (!empty($account->uid) && user_access('access user profiles')) {
+        $attributes = array(
+          'attributes' => array('title' => t('View user profile.')),
+          'html' => TRUE,
+        );
+        $variables['picture'] = l($variables['picture'], "user/$account->uid", $attributes);
+      }
+    }
+  }
+}
+
+function transition_form_alter(&$form, &$form_state, $form_id) {
+//  krumo($form);
+}
+
+
+
+

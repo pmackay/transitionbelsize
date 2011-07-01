@@ -1,0 +1,32 @@
+Index: image_fupload.module
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/image_fupload/image_fupload.module,v
+retrieving revision 1.34
+diff -u -p -r1.34 image_fupload.module
+--- image_fupload.module	9 Jun 2009 22:25:54 -0000	1.34
++++ image_fupload.module	16 Dec 2009 20:23:16 -0000
+@@ -134,7 +134,7 @@ function image_fupload_theme() {
+ function fupload_filetransfer() {
+   // huh.. swfUpload sends some data...let's see
+   global $user;
+-  $sid = $_POST['PHPSESSID'];
++  $sid = $_POST[session_name()];
+   $node_type = check_plain($_POST['nodetype']);
+   $field_name = check_plain($_POST['fieldname']);
+ 
+Index: swfupload-settings.tpl.php
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/image_fupload/swfupload-settings.tpl.php,v
+retrieving revision 1.18
+diff -u -p -r1.18 swfupload-settings.tpl.php
+--- swfupload-settings.tpl.php	9 Jun 2009 22:25:54 -0000	1.18
++++ swfupload-settings.tpl.php	16 Dec 2009 20:23:16 -0000
+@@ -16,7 +16,7 @@ window.onload = function() {
+   var settings = {
+     flash_url : "<?php print $modulepath; ?>/swfupload/swfupload.swf",
+     upload_url: "<?php print $uploadpath; ?>",  // Relative to the SWF file
+-    post_params: {"PHPSESSID" : "<?php print $sessionid; ?>" , "nodetype" : "<?php print $nodetype; ?>", "fieldname" : "<?php print $fieldname; ?>"},
++    post_params: {"<?php print session_name(); ?>" : "<?php print $sessionid; ?>" , "nodetype" : "<?php print $nodetype; ?>", "fieldname" : "<?php print $fieldname; ?>"},
+     file_post_name: "Filedata",
+     file_size_limit : "<?php print $maxfilesize; ?>",
+     file_types : "<?php print $fileextensions; ?>",
