@@ -493,9 +493,9 @@ function transition_preprocess_user_picture(&$variables) {
   }
 }
 
-function transition_form_alter(&$form, &$form_state, $form_id) {
-//  krumo($form);
-}
+//function transition_form_alter(&$form, &$form_state, $form_id) {
+//  dpm($form);
+//}
 
 
 
