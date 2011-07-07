@@ -69,8 +69,13 @@
 .node .meta /* Wrapper for submitted and terms data */ {
 }
 
+.node .terms,
+.node ul.links {
+  font-size: 13px;
+}
+
 .node .submitted /* The "posted by" information */ {
-  font-size: 0.8em;
+  font-size: 13px;
   color: #8D8A62;
 }
 
