@@ -74,9 +74,18 @@
   font-size: 13px;
 }
 
+.node.node-teaser ul.links li {
+  padding: 0 0.5em;
+}
+
+.node ul.links li {
+  padding: 0;
+}
+
 .node .submitted /* The "posted by" information */ {
   font-size: 13px;
   color: #8D8A62;
+  display: block;
 }
 
 .node .terms /* Node terms (taxonomy) */ {
@@ -85,8 +94,6 @@
 .node .content /* Node's content wrapper */ {
 }
 
-.node ul.links /* Node links. See also the ul.links declaration in the pages.css. */ {
-}
 
 .preview .node /* Preview of the content before submitting new or updated content */ {
   /* background-color: #ffffea; */ /* Drupal core uses a #ffffea background */
