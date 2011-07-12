@@ -187,15 +187,14 @@
                   <div class="section">
          
                      <?php if(drupal_is_front_page()): ?>
-                     <?php print $breadcrumb; ?>
+                       <?php print $breadcrumb; ?>
                      <?php else: ?>
-                     <?php print $breadcrumb . $sep. $title; ?>
-         			   <?php endif; ?>
+                       <?php print $breadcrumb . $sep. $title; ?>
+             			   <?php endif; ?>
 
                      <?php print $highlight; ?>
 
-                     <?php print $messages; ?><?php print 'LALAMA KAKOTA'; ?>
-				
+                     <?php print $messages; ?>
 
                      <?php print $content_top; ?>
 
@@ -250,17 +249,18 @@
                         <div class="navCenter">
 
                          <?php 
-                         print theme(array('links__system_main_menu', 'links'), $primary_links,
-                           array(
-                             'id' => 'main-menu',
-                             'class' => 'linksNav clearfix',
-                           ),
-                           array(
-                             'text' => t('Main menu'),
-                             'level' => 'h2',
-                             'class' => 'element-invisible',
-                           ));
-//                           print theme_nice_menus_primary_links();
+//                         print theme(array('links__system_main_menu', 'links'), $primary_links,
+//                           array(
+//                             'id' => 'main-menu',
+//                             'class' => 'linksNav clearfix',
+//                           ),
+//                           array(
+//                             'text' => t('Main menu'),
+//                             'level' => 'h2',
+//                             'class' => 'element-invisible',
+//                           ));
+                         
+                           print theme_nice_menus_primary_links();
                          ?>
 
                          <?php print $navigation; ?>

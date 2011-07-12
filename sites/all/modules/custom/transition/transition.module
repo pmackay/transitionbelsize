@@ -274,6 +274,13 @@ function transition_nodeapi(&$node, $op, $teaser, $page) {
 }
 
 /**
+ * Implementation of hook_init()
+ */
+function transition_init() {
+//  dpm(theme_nice_menus_primary_links());
+}
+
+/**
  * Implementation of hook_theme().
  *
  * This lets us tell Drupal about our theme functions and their arguments.

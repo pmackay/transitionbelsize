@@ -29,15 +29,17 @@ body.front ul.links { float: right; } /*moves links right */
 /* main navigation */
 
 .navLeft {
-	background-image:url("../images/nav_bg_left.png"); width:30px;
+	background-image: url("../images/nav_bg_left.png"); width:30px;
 	float: left;
 	height: 51px;
 	width: 20px;
 }
 
-.navCenter {background-image:url("../images/nav_bg_center.png");	
-	float:left;
-	height:51px;
+.navCenter {
+  background-image: url("../images/nav_bg_center.png");
+  background-repeat: repeat-x;
+	float: left;
+	height: 51px;
 	padding-top: 8px;
 }
 
@@ -45,7 +47,7 @@ body.front ul.links { float: right; } /*moves links right */
 	background-image:url("../images/nav_bg_right.png"); width:30px;
 	float: left;
 	height: 51px;
-	width: 15px;}
+	width: 15px;
 }
 
 .navigation a {
