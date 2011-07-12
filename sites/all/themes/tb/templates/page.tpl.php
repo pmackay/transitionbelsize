@@ -192,14 +192,9 @@
                      <?php print $breadcrumb . $sep. $title; ?>
          			   <?php endif; ?>
 
-                     <?php if ($mission): ?>
-                     
-                     <div id="mission"><?php //print $mission; ?></div>
-                 
-                     <?php endif; ?>
-
                      <?php print $highlight; ?>
 
+                     <?php print $messages; ?><?php print 'LALAMA KAKOTA'; ?>
 				
 
                      <?php print $content_top; ?>
@@ -214,7 +209,7 @@
                      <!--div style='border-top:2px dashed gray';-->
                      <h1 class="title"><?php print $title; ?></h1>
                      <?php endif; ?>
-                     <?php print $messages; ?>
+
                      <?php if ($tabs): ?>
                      <div class="tabs"><?php print $tabs; ?></div>
                      <?php endif; ?>
@@ -254,7 +249,8 @@
            
                         <div class="navCenter">
 
-                         <?php print theme(array('links__system_main_menu', 'links'), $primary_links,
+                         <?php 
+                         print theme(array('links__system_main_menu', 'links'), $primary_links,
                            array(
                              'id' => 'main-menu',
                              'class' => 'linksNav clearfix',
@@ -264,6 +260,7 @@
                              'level' => 'h2',
                              'class' => 'element-invisible',
                            ));
+//                           print theme_nice_menus_primary_links();
                          ?>
 
                          <?php print $navigation; ?>

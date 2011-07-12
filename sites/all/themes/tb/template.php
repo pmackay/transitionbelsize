@@ -136,6 +136,8 @@ function tb_preprocess_page(&$vars, $hook) {
     $vars['map'] = $map . '<div id="enlarge-map">'. $enlarge .'</div><div class="clear" id="loc_bottom"></div>';
   }*/
 
+  unset($vars['mission']);
+  
   _add_footer_links($vars);
 }
 
