@@ -5,9 +5,6 @@ Drupal.behaviors.tb = function(context) {
   $nav.each(function() {
     var originalHeight = $(this).height();
     $(this)
-//    .css({
-//      'border': 'solid red'
-//    })
       .find('.section .navCenter')
       .hover(
         function() {
