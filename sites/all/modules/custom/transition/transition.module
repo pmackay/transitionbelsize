@@ -277,7 +277,10 @@ function transition_nodeapi(&$node, $op, $teaser, $page) {
  * Implementation of hook_init()
  */
 function transition_init() {
-//  dpm(theme_nice_menus_primary_links());
+  $delay = 600;
+  if(variable_get('nice_menus_sf_delay', 800) > $delay) {
+    variable_set('nice_menus_sf_delay', $delay);
+  }
 }
 
 /**

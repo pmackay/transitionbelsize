@@ -249,17 +249,6 @@
                         <div class="navCenter">
 
                          <?php 
-//                         print theme(array('links__system_main_menu', 'links'), $primary_links,
-//                           array(
-//                             'id' => 'main-menu',
-//                             'class' => 'linksNav clearfix',
-//                           ),
-//                           array(
-//                             'text' => t('Main menu'),
-//                             'level' => 'h2',
-//                             'class' => 'element-invisible',
-//                           ));
-                         
                            print theme_nice_menus_primary_links();
                          ?>
 

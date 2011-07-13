@@ -136,7 +136,11 @@ function tb_preprocess_page(&$vars, $hook) {
     $vars['map'] = $map . '<div id="enlarge-map">'. $enlarge .'</div><div class="clear" id="loc_bottom"></div>';
   }*/
 
+  // we dont need it
   unset($vars['mission']);
+  
+  // default js for site
+  drupal_add_js(path_to_theme(). '/js/tb.js');
   
   _add_footer_links($vars);
 }
