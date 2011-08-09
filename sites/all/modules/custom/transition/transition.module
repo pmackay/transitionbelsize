@@ -503,10 +503,16 @@ function transition_preprocess_user_picture(&$variables) {
   }
 }
 
-//function transition_form_alter(&$form, &$form_state, $form_id) {
-//  dpm($form);
-//}
-
+function transition_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'simplenews_block_form_1') {
+    $form['submit']['#value'] = 'Subscribe';
+    $form['mail']['#size'] = 16;
+    unset($form['mail']['#title']);
+    unset($form['action']);
+    $form['action']['#type'] = 'value';
+    $form['action']['#value'] = 'subscribe';
+  }
+}
 
 
 
