@@ -44,9 +44,7 @@ ul.nice-menu ul {
 }
 
 ul.nice-menu ul li {
-  width: 12.5em;
   background-image: url("../images/nav_bg_center.png");	
-  
 }
 
 /******************************
@@ -138,9 +136,6 @@ ul.nice-menu-down li ul li ul {
   top: -1px;
 }
 
-ul.nice-menu-down .menuparent a {
-  padding-right: 15px; /* LTR */
-}
 
 ul.nice-menu-down li.menuparent {
 }
