@@ -24,3 +24,18 @@
 td.views-field-created {
   width: 20%;
 }
+
+/* Frontpage upcoming events table. */
+
+table.views-view-grid td {
+  width: 33%;
+}
+
+tr.text-row div.views-field-field-image-fid {
+  display:none;
+}
+
+tr.image-row div.views-field-title,tr.image-row div.views-field-field-date-value,tr.image-row div.views-field-field-location-nid {
+  display:none;
+}
+
