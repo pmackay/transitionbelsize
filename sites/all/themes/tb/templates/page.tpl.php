@@ -187,11 +187,14 @@
                   <div class="section">
          
                      <?php if(drupal_is_front_page()): ?>
+                       <div class="breadcrumb">
                        <?php print $breadcrumb; ?>
+                       </div>
                      <?php else: ?>
+		       <div class="breadcrumb">
                        <?php print $breadcrumb . $sep. $title; ?>
-             			   <?php endif; ?>
-
+		       </div>
+                     <?php endif; ?>
                      <?php print $highlight; ?>
 
                      <?php print $messages; ?>

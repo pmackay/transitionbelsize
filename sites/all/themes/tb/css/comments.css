@@ -8,6 +8,7 @@
 
 #comments /* Wrapper for the list of comments and its title */ {
   margin: 1em 0;
+  border-top: 1px dotted gray;
 }
 
 #comments .title /* Heading for the list of comments */ {

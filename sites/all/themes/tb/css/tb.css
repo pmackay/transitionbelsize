@@ -1,3 +1,16 @@
+p {
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+
+.view-content h2 a {
+  font-size: 0.9em;
+}
+
+ul.links li {
+  padding: 0 0.1em;
+}
+
 body ul.links li a { 
 	color: #757080; 
 	background: no-repeat; 
@@ -11,8 +24,6 @@ body ul.links-foot li a {
 	padding-left: 0px;
 }
 
-body.front ul.links { float: right; } /*moves links right */
-
 #name-and-slogan {
     visibility: hidden; /* hides site name text as we have it in image form in header GR */
 }
@@ -21,10 +32,6 @@ body.front ul.links { float: right; } /*moves links right */
 	padding-bottom: 4em;
 	background-image: url('../images/white_paper_tile_03_01.png');
 }
-
-
-
-
 
 /* main navigation */
 
@@ -54,11 +61,20 @@ body.front ul.links { float: right; } /*moves links right */
 	font-size: 3em;
 }
 
-
-
-
-
 /* sidebar */
+
+
+.sidebar .block h2.title {
+  padding-bottom: 4px;
+}
+
+.sidebar .block p {
+  margin-bottom: 4px;
+}
+
+.sidebar .block .view-gallery-slideshow p {
+  text-align: right;
+}
 
 .sidebar {
 	width:263px;
@@ -83,9 +99,6 @@ body.front ul.links { float: right; } /*moves links right */
 }
 
 
-
-
-
 /* event index tables */
 
 /*body.page-events .views-table {
@@ -95,10 +108,7 @@ body.front ul.links { float: right; } /*moves links right */
 body.page-events .view-content table {
 	margin-top: 1em;
 	margin-bottom: 0em;
-	
 }
-
-
 
 body.page-events .view-content thead a {
 	font-family: georgia, serif;
@@ -113,8 +123,6 @@ body.page-events .view-content tbody a {
 body.page-events .view-content tbody a:hover {
 	color: #6E7F8A;	
 }
-
-
 
 body.page-events .view-content table, th, tr, td, tr.even, tr.odd {
 	background-color: none;
@@ -133,9 +141,8 @@ body.page-events .view-content td {
 }
 
 body.page-events .view-content tr.even, tr.odd {
-	background-color: none;
-    border-bottom: 1px solid #CCCCCC;
-    /*padding: 0.1em 0.6em;*/
+  background-color: none;
+  border-bottom: 1px dotted gray;
 }
 
 body.page-events .view-content td.active {
@@ -151,17 +158,13 @@ body.page-events .view-content th {
 	padding: 0 0 2px;
 }
 
-
 body.page-events .view-content td.views-field-title {
 	/*width:233px;*/
 }
 
 body.page-events .view-content th.views-field-title {
 	width:223px;
-	
 }
-
-
 
 body.page-events .view-content th.views-field-field-location-nid {
 	width: 135px;
@@ -170,8 +173,6 @@ body.page-events .view-content th.views-field-field-location-nid {
 body.page-events .view-content td.views-field-field-location-nid {
 	/*width: 162px;*/
 }
-
-
 
 body.page-events .view-content th.views-field-name {
 	width:110px;
@@ -182,8 +183,6 @@ body.page-events .view-content td.views-field-name {
 	white-space: normal;
 }
 
-
-
 body.page-events .view-content th.views-field-field-date-value {
 	width:117px;
 }
@@ -191,8 +190,6 @@ body.page-events .view-content th.views-field-field-date-value {
 body.page-events .view-content td.views-field-field-date-value {
 	/*width:103px;*/
 }
-
-
 
 body.page-events .view-content td.views-field- {
 	/*width:33px;*/
@@ -228,9 +225,8 @@ body.page-og .view-content tbody a:hover {
 }
 
 body.page-og .view-content tr.even, tr.odd {
-	background-color: none;
-  border-bottom: 1px solid #CCCCCC;
-  /*padding: 0.1em 0.6em;*/
+  background-color: none;
+  border-bottom: 1px dotted gray;
 }
 
 body.page-og .view-content td {
@@ -263,29 +259,7 @@ body.page-og
 
 */
 
-/*
-** /////////////// Event Page ////////////////
-**
-**
-**
-*/
-
-.event-details-wrapper {
-	border-bottom:2px dashed gray;
-	
-}
-
-.event-details {
-	/*text-transform:capitalize;*/
-}
-.event-details .meta, .event-details .groups, .rsvp-event, .loc-con {
-	padding-top: 1.8em;
-	/*text-transform:capitalize;*/
-}
-
-.event-details .groups ul.links li {
-	padding: 0 0.1em;
-}
+/*    Events Page         */
 
 body.section-event .groups ul.links li a {
 	color: #007D03;
@@ -302,13 +276,56 @@ body.section-event .groups ul.links li a:hover {
   border: solid 2px red;
 }
 
+.node-type-event .event-map {
+  padding-bottom: 4px;
+}
+
+.node-type-event .node .content {
+  padding-top: 10px;
+}
+
 .event-details {
   width: 245px;
   float: left;
-	padding-top: 12px;
 }
 
+.event-details p {
+  font-size: 1.3em;
+}
 
+.node-type-event form#signup-form, .signup_anonymous_login {
+  padding-bottom: 14px;
+}
+
+.node-type-event .field-field-image {
+  float: right;
+  padding-left: 4px;
+}
+
+.field-field-image img.imagecache-event_teaser {
+  float: right;
+  margin-left: 4px;
+}
+
+.imagecache-event_thumb img, .imagecache-event_node img, img.imagecache-event_thumb ,img.imagecache-event_node, img.imagecache-event_teaser, img.imagecache-event_view {
+  -webkit-box-shadow: 0px 0px 4px #b86f4f;
+  -moz-box-shadow: 0px 0px 4px #b86f4f;
+  box-shadow: 0px 0px 4px #b86f4f;
+  margin-top: 4px;
+}
+
+.node-type-event ul.links li {
+  padding: 0 0.5em 0 0;
+}
+
+.node-type-event .event-details .field-item, .links, .node-type-event .field-field-coordinators .field-items {
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.node-type-event .field-field-coordinators .field-items .field-item {
+  display: inline; 
+}
 
 .location-add ul {
 	padding:0px;
@@ -321,24 +338,27 @@ body.section-event .groups ul.links li a:hover {
 }
 
 .event-map {
-	float: right;
-	padding-top: 12px;
+  float: right;
+  margin-right: 5px;
+  margin-top: 10px;
 }
 
-
-
-
-
-
-
-
-
-.issues-link a {
-	color:black;
-	text-decoration: underline;
+.event-map iframe {
+  width: 370px;
+  height: 150px;
+  -webkit-box-shadow: 0px 0px 2px #b86f4f;
+  -moz-box-shadow: 0px 0px 2px #b86f4f;
+  box-shadow: 0px 0px 2px #b86f4f;
 }
 
+.embed-gmap-link {
+  text-align: right;
+  font-size: 0.9em;
+}
 
+.view-upcoming-events .views-view-grid td {
+  width: 207px;
+}
 
 #enlarge-map  {
   float: right;
@@ -347,16 +367,20 @@ body.section-event .groups ul.links li a:hover {
 #enlarge-map a {
   background: url(../images/enlarge.png) no-repeat;
   padding-left: 22px;
-	color: #757080; 
+        color: #757080; 
 }
 
+.issues-link a {
+	color:black;
+	text-decoration: underline;
+}
 
 .clear {
   clear: both;
 }
 
 #loc_bottom {
-	border-bottom: 2px dashed gray;
+	border-bottom: 1px dotted gray;
 	width:100%;
 	margin-bottom:2em;
 }
@@ -390,8 +414,6 @@ ul.links-foot {
 	margin: 0px;
 }
 
-
-
 ul.links-foot li {
     display: inline;
     list-style-type: none;
@@ -404,11 +426,8 @@ ul.links-foot li {
 	margin-bottom: 2em;
 }
 
-
-
 .for-border-bottom {
 	margin-left: 0.6em;
-	border-bottom:2px dashed gray;
 	height:156px;
 }
 
@@ -417,8 +436,6 @@ ul.links-foot li {
 	margin-right: -630px;
 	width: 630px;
 }
-
-
 
 
 /* ////////////////////////  sidebar  /////////////////////// */
@@ -451,31 +468,32 @@ ul.links-foot li {
 	text-transform: capitalize;
 }
 
-.	sidebar-margin {
-	margin-left: 2em;
-	padding-top: 3em:;
+.sidebar .block .item-list {
+  margin-bottom: 0px;
+  padding-top: 0px;
 }
 
-
-/*
-
-below css controls img of attendees in sidebar
-
-#block-transition-attendees .picture {
-	float: left;
+.view-og-members-block {
+  padding-top: 10px;
 }
 
-.picture a img {
-	width:30px;
-	height:30px;
+.view-og-members-block tr.even, .view-og-members-block tr.odd {
+  border: none;
 }
-*/
 
+.view-og-members-block table {
+  margin: 0;
+}
 
+.view-og-members-block .views-field-name {
+  text-align: left;
+  vertical-align: middle;
+}
 
-
-
-
+.view-og-members-block .views-field-picture img {
+  margin: 2px;
+  float: none;
+}
 
 
 #block-views-calendar-block_1 ul li {
@@ -645,3 +663,24 @@ div.post-title {
 /*.cke_editor_edit-body{
   height:80px;
 }*/
+
+ul.links li.sharethis_link {
+  display: block;
+  float: left;
+  clear: both;
+}
+
+#block-panels_mini-upcoming_events, #mission {
+  border-bottom: 1px dotted gray; 
+}
+
+.view-og-ghp-ron {
+  border-bottom: 1px dotted gray; 
+  padding-bottom: 1em;
+}
+
+.meta .og-groups, .meta .terms {
+  float: right;
+  margin-top: 0px;
+}
+

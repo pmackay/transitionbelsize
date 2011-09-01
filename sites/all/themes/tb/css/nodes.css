@@ -8,10 +8,7 @@
  */
 
 
-.node /* Node wrapper */ { 
-	border-bottom:2px dashed #808080;/*adds grey dashed line to bottom of posts GR*/
-	padding-bottom:1em;/*pushes dotted line down GR */
-	
+.node {
 }
 
 .node-sticky /* A sticky node (displayed before others in a list) */ {
@@ -39,6 +36,8 @@
 }
 
 .node-teaser /* A node displayed as teaser */ {
+  border-bottom:1px dotted gray; 
+  padding-bottom:1em;
 }
 
 /* All nodes are given a node-type-FOO class that describes the type of
@@ -67,6 +66,7 @@
 }
 
 .node .meta /* Wrapper for submitted and terms data */ {
+  margin-bottom: 5px;
 }
 
 .node .terms,
@@ -93,8 +93,7 @@
 }
 
 .node .og-mission {
-  background: #eee;
-  padding: 2px 10px;
+  padding: 2px 0px;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px; 

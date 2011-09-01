@@ -51,6 +51,7 @@
  * @see template_preprocess_node()
  */
 ?>
+
 <div id="node-<?php print $node->nid; ?>" class="node<?php if ($sticky) { print ' sticky'; } ?><?php if (!$status) { print ' node-unpublished'; } ?> clear-block">
 
   <?php print $picture ?>
@@ -60,54 +61,46 @@
   <?php else: ?>
     <!-- <h2 class="title"><?php print $title; ?></h2> -->
   <?php endif; ?>
-    
+
   <?php if($page): ?>
   <div class="event-details">
   <?php else: ?>
   <div>
   <?php endif; ?>
-    
-      
-    <span>When: <?php print $event_date; ?></span>
 
+    <?php if ($node->og_groups && $page): ?>
+      <div class="links og-groups"><?php print $og_links['view']; ?></div>
+    <?php endif; ?>
+
+    <div class="field-item event-date">
+      <p><?php print $event_date; ?></p>
+    </div>
     <?php if($page): ?>
-    <!--div class="location loc-on location-add">
-      Location: <?php print $location; ?>
-    </div-->
-    <div class="loc-con">
-       <div class="location">Where: </div>
-       <div class="location-add"><?php print $location; ?></div>
+    <div class="field-item event-location">
+      <p><?php print $location; ?></p>
     </div>
     <?php endif; ?>
 
-    <!-- <div class="meta clear">
-    <?php if ($submitted && $page): ?>
-      <span class="submitted">Submitted by <?php print $submitted ?></span>
-    <?php endif; ?>
-
-    <?php if ($terms): ?>
-      <div class="terms terms-inline"><?php print $terms ?></div>
-    <?php endif;?>
-    </div>-->
-
-    <?php if ($node->og_groups && $page): ?>
-      <div class="groups"><?php print t('Groups:'); ?>
-        <div class="links"><?php print $og_links['view']; ?></div>
-      </div>
-    <?php endif; ?>
-    
-  </div> <!-- red -->
+  </div>
 
   <?php if($page): ?>
     <div class="event-map"><?php print $google_map; ?></div>
   <?php endif; ?>
 
   <div class="clear"></div>
-  
+
   <div class="content">
-    <?php print $content; ?>
+   <?php print $content; ?>
   </div>
 
-  
+  <div class="meta">
+  <?php if ($node->og_groups && !$page) {
+    print '<div class="links og-groups">'.  $og_links['view']. '</div>';
+   } ?>
+  <?php if ($terms): ?>
+    <div class="terms terms-inline"><?php print $terms ?></div>
+  <?php endif;?>
+  </div>
+
   <?php print $links; ?>
 </div>

@@ -213,9 +213,6 @@ function tb_preprocess_node_event(&$vars, $hook) {
   $path = 'users/'. $event_user->name;
   $vars['submitted'] = l($event_user->name, $path, array('attributes' => array('title' => $title)));
 
-  // RSVP: Attend event
-  $vars['attend_event'] = get_attend_event_button($vars['node']);
-
   // event google map
   $vars['google_map'] = _get_event_map($vars['node']->field_location[0]['nid']);
   
@@ -306,92 +303,6 @@ function tb_preprocess_content_field($vars) {
 	 	$map = '<iframe width="'. $width .'" height="'. $height .'" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="'. $src .'"></iframe><p class="embed-gmap-link"><a href="'. str_replace('&amp;output=embed', '', $src) .'" target="_BLANK">'. t('enlarge') .'</a></p>';
 			
 		$vars['google_map'] = $map;		
-	}
-}
-
-/*function tb_preprocess_views_view_table(&$vars) {
-	if($vars['view']->vid == 4) {
-		// add image to each offer
-		foreach($vars['rows'] as $count => $row) {
-			$nid = $vars['view']->result[$count]->nid;
-			$num_attendees = get_attendees($nid);	
-			if(is_array($num_attendees)) {
-				$num_attendees = count($num_attendees);
-			} else {
-				$num_attendees = 0;
-			}
-
-      if(empty($row['field_max_attendees_value'])) {
-				$vars['rows'][$count]['field_max_attendees_value'] = $num_attendees. '/' .variable_get('rsvp_default_max_guests', 123);
-			} else {
-        $vars['rows'][$count]['field_max_attendees_value'] = $num_attendees. '/' .$vars['rows'][$count]['field_max_attendees_value'];
-      }
-		}
-	
-		// add empty header
-		$vars['header']['num_attendees'] = 'Atnd.';
-		
-	}
-}*/
-
-/*function tb_preprocess_views_view_fields__block_1(&$vars) {
-  // get location title
-  $view_row_id = $vars['id']-1;
-  $event = node_load($vars['view']->result[$view_row_id]->nid);
-  $location = node_load($event->field_location[0]['nid']);
-
-  // add field location to view row
-  $flocation = new stdClass();
-  $flocation->content = $location->title;
-  $flocation->inline = FALSE;
-  $flocation->inline_html = 'div';
-  $flocation->class = 'location';
-  $flocation->element_type = 'span';
-  $flocation->label = '';
-  $vars['fields']['location_name'] = $flocation;
-}*/
-
-
-function get_attend_event_button($event) {
-	if(user_is_logged_in()) {
-		
-		// ..if max attendees is reached or above then STOP subscribing 
-		// and we not attend for this event
-		if($event->field_max_attendees[0]['value']) {
-			$max = $event->field_max_attendees[0]['value'];
-		} else {
-			$max = variable_get('rsvp_default_max_guests', 123);
-		}
-		if(count(get_attendees_uids($event->nid)) >= $max && !user_allready_attend($event->nid)) {
-			$button = t('Max attendees for this event are reached.');
-		} else {
-
-			if(user_allready_attend($event->nid)) {
-				$button = t('You are registered.'). '&nbsp; ('. l('Unsubscribe', "node/{$event->nid}/unsubscribe"). ')';
-			} else {
-				$button = l(t('Attend event'), "node/{$event->nid}/attend");
-			}			
-		}
-		
-	} else { // for anonymouse users..
-		$logregvars = array(
-			'!l' => l('Login', 'user', array('query' => drupal_get_destination())), 
-			'!r' => l('register', 'user/register', array('query' => drupal_get_destination()))
-		);
-		$button = t('!l or !r to attend events', $logregvars);
-	}
-	
-	return 'RSVP: '. $button;
-}
-
-function user_allready_attend($event_nid) {
-	global $user;
-	$auids = get_attendees_uids($event_nid);
-
-	if(is_array($auids)) {
-		return in_array($user->uid, $auids) ? TRUE : FALSE;
-	} else {
-		return FALSE;
 	}
 }
 

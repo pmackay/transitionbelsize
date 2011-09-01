@@ -60,27 +60,27 @@
 <?php endif; ?>
 
   <?php if ($node->og_groups && $page) {
-          print '<div class="groups">'. t('Groups'). ': ';
-          print '<div class="links">'.  $og_links['view']. '</div></div>';
+          print '<div class="links og-groups">'.  $og_links['view']. '</div>';
    } ?>
-
-	<?php if($attend_event && $page): ?>
-		<div><?php //print $attend_event; ?></div>
-	<?php endif; ?>
 
   <div class="content">
     <?php print $content ?>
   </div>
-  
+
   <div class="meta">
   <?php if ($submitted): ?>
     <span class="submitted"><?php print $submitted ?></span>
   <?php endif; ?>
 
+  <?php if ($node->og_groups && !$page) {
+    print '<div class="links og-groups">'.  $og_links['view']. '</div>';
+   } ?>
+
   <?php if ($terms): ?>
     <div class="terms terms-inline"><?php print $terms ?></div>
   <?php endif;?>
   </div>
-  
+
   <?php print $links; ?>
+
 </div>
