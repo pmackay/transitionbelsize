@@ -73,7 +73,7 @@
     <?php endif; ?>
 
     <div class="field-item event-date">
-      <p><?php print $event_date; ?></p>
+      <p><?php print content_format('field_date', $node->field_date[0], $formatter = 'long'); ?></p>
     </div>
     <?php if($page): ?>
     <div class="field-item event-location">
