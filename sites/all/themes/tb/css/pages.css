@@ -112,7 +112,9 @@ div#site-name /* The name of the website */ {
 
 #main {
 	margin-left:2em;
+	margin-right:2em;
 	padding-bottom: 16px;
+	font-family: 'Lucida Grande',Verdana,Helvetica,sans-serif;
 }
 
 /*
@@ -278,7 +280,7 @@ ul.linksNav li a:active {
  */
 #footer {
 	background-image: url("../images/white_paper_tile_03_01.png");
-	height: 200px;
+	height: 300px;
 	
 }
 

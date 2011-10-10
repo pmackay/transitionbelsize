@@ -40,7 +40,7 @@ body {
   font-size: 14px; /* 16px x .875 = 14px */
   line-height: 1.286em; /* 14px x 1.286 = 18px */
 	font: 14px georgia, serif; /*changed GR */
-	color: #605c43; 
+	color: #494737; 
 }
 
 body,
@@ -77,7 +77,7 @@ fieldset {
 
    */
 
-  font-family:  georgia, serif, Verdana, Tahoma, "DejaVu Sans", sans-serif;
+/*  font-family:  georgia, serif, Verdana, Tahoma, "DejaVu Sans", sans-serif;*/
 }
 
 pre,
@@ -110,7 +110,7 @@ h2 {
 }
 
 .view-content h2 a {
-  color: #757080;
+  color: #494737;
 	    font-size: 0.643em;
 	    line-height: 1.3em;
 	    margin-bottom: 0.167em;

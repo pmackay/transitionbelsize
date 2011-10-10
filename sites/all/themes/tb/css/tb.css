@@ -31,6 +31,7 @@ body ul.links-foot li a {
 #main-wrapper {
 	padding-bottom: 4em;
 	background-image: url('../images/white_paper_tile_03_01.png');
+/*	background-color: #F5E9D6;*/
 }
 
 /* main navigation */
@@ -111,7 +112,7 @@ body.page-events .view-content table {
 }
 
 body.page-events .view-content thead a {
-	font-family: georgia, serif;
+/*	font-family: georgia, serif;*/
 	color: #605C43;
 	text-decoration:underline;
 }
@@ -126,7 +127,7 @@ body.page-events .view-content tbody a:hover {
 
 body.page-events .view-content table, th, tr, td, tr.even, tr.odd {
 	background-color: none;
-	font-family: georgia, serif;
+/*	font-family: georgia, serif;*/
 	font-size:10pt;
 	width:630px;
 	vertical-align:top;
@@ -204,14 +205,14 @@ body.page-events .view-content th.views-field- {
 
 body.page-og .view-content table, th, tr, td, tr.even, tr.odd {
 	background-color: none;
-	font-family: georgia, serif;
+/*	font-family: georgia, serif;*/
 	font-size:10pt;
 	width:630px;
 	vertical-align:top;
 }
 
 body.page-og .view-content thead a {
-	font-family: georgia, serif;
+/*	font-family: georgia, serif;*/
 	color: #605C43;
 	text-decoration:underline;
 }
@@ -682,5 +683,28 @@ ul.links li.sharethis_link {
 .meta .og-groups, .meta .terms {
   float: right;
   margin-top: 0px;
+}
+
+
+
+.node-type-gallery * .field-item {
+	display: inline;
+}
+
+.node-type-news * div.field-field-image .field-items .field-item {
+	float: right;
+}
+
+/* Fix some formatting issues on the new account page. */
+.wysiwyg > ul.tips {
+	display:none
+}
+
+#cke_contents_edit-body {
+  height: 200px !important;
+}
+
+.field-field-address > .field-label {
+	display:none
 }
 
