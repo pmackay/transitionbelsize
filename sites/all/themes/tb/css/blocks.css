@@ -98,7 +98,7 @@
 #block-user-3 /* "Who's online" block for a list of the online users */ {
 }
 
-#edit-mail-wrapper {
+#simplenews-block-form-1 * #edit-mail-wrapper {
   float: left;
   margin: 0;
   margin-right: 1em;
