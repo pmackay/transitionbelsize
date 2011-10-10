@@ -1,0 +1,14 @@
+; $Id:
+name = OG Contact
+description = "Create contact module style contact forms for Organic Groups."
+dependencies[] = og
+package = "Organic groups"
+project = "og_contact"
+
+core = 6.x
+; Information added by drupal.org packaging script on 2011-08-23
+version = "6.x-1.0"
+core = "6.x"
+project = "og_contact"
+datestamp = "1314109629"
+

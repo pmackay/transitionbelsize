@@ -1,0 +1,415 @@
+<?php
+
+/**
+ * @file
+ * Enables the use of contact forms for Organic Groups
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function og_contact_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#og_contact':
+      $output = '<p>'. t('The OG contact module enables the use of contact module style contact forms on a per group basis. The emails are sent to the administrators of the Organic Group and/or a recipientes list. Users can specify a subject and message in the contact form, and also request that a copy of the e-mail be sent to their own address.') .'</p>';
+      return $output;
+    case 'admin/og/contact':
+      $output = '<p>'. t('This page lets you set up contact forms for Organic Groups. To do so, <a href="@groups">add one or more groups</a>. The recipients for each group can either be the administrators of that group, a list of recipients, or both. On the <a href="@settings">settings page</a>, you can customize the information shown above the group contact forms, as well as some settings for the module. These settings apply to all group contact forms.', array('@groups' => url('admin/og/contact/add'), '@settings' => url('admin/og/contact/settings'))) .'</p>';
+      $output .= '<p>'. t('Groups that have contact forms enabled will get a contact page with a URL like "node/nid/contact."') .'</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function og_contact_perm() {
+  return array('access og contact form', 'administer og contact form', 'administer group contact form', 'receive og contact submissions');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function og_contact_menu() {
+  $items = array();
+  $items['admin/og/contact'] = array(
+    'title' => 'OG Contact form',
+    'description' => 'Create a contact module like form for Organic Groups.',
+    'page callback' => 'og_contact_admin_groups',
+    'access arguments' => array('administer og contact form'),
+    'file' => 'og_contact.admin.inc',
+  );
+  $items['admin/og/contact/list'] = array(
+    'title' => 'List',
+    'page callback' => 'og_contact_admin_groups',
+    'access arguments' => array('administer og contact form'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'og_contact.admin.inc',
+  );
+  $items['admin/og/contact/add'] = array(
+    'title' => 'Add Group',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_contact_admin_add'),
+    'access arguments' => array('administer og contact form'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+    'file' => 'og_contact.admin.inc',
+  );
+  $items['admin/og/contact/edit/%og_contact_group_node'] = array(
+    'title' => 'Edit Group contact',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_contact_admin_edit'),
+    'access arguments' => array('administer og contact form'),
+    'type' => MENU_CALLBACK,
+    'file' => 'og_contact.admin.inc',
+  );
+  $items['admin/og/contact/delete/%og_contact_del_group'] = array(
+    'title' => 'Delete contact form',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_contact_admin_delete'),
+    'access arguments' => array('administer og contact form'),
+    'type' => MENU_CALLBACK,
+    'file' => 'og_contact.admin.inc',
+  );
+  $items['admin/og/contact/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_contact_admin_settings'),
+    'access arguments' => array('administer og contact form'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
+    'file' => 'og_contact.admin.inc',
+  );
+  $items['admin/og/contact/addall'] = array(
+    'title' => 'Add all groups',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_contact_admin_add_all'),
+    'access arguments' => array('administer og contact form'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'og_contact.admin.inc',
+  );
+  $items['admin/og/contact/deleteall'] = array(
+    'title' => 'Delete all groups',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_contact_admin_delete_all'),
+    'access arguments' => array('administer og contact form'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+    'file' => 'og_contact.admin.inc',
+  );
+
+  // contact tab on group node
+  $items['node/%og_contact_group_node/contact'] = array(
+    'title' => 'Contact',
+    'page callback' => 'og_contact_page',
+    'access callback' => 'og_contact_can_view_contact',
+    'access arguments' => array(1),
+    'type' => variable_get('og_contact_display_tab', 1) ? MENU_LOCAL_TASK : MENU_CALLBACK,
+    'weight' => 6,
+    'file' => 'og_contact.pages.inc',
+    );
+  $items['node/%og_contact_admin_single/contact/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('og_contact_admin_edit'),
+    'access callback' => 'og_contact_can_edit_group_settings',
+    'access arguments' => array(1),
+    'type' => MENU_CALLBACK,
+    'file' => 'og_contact.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function og_contact_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'insert':
+      if (og_is_group_type($node->type) == 1 && variable_get('og_contact_enable_all', 0)) {
+        db_query("INSERT INTO {og_contact} (gid, reply) VALUES ('%d','%s')", $node->nid, '');
+        drupal_set_message(t('Contact form for %group added.', array('%group' => $node->title)));
+        watchdog('mail', 'OG Contact: Form for %group added.', array('%group' => $node->title), WATCHDOG_NOTICE, l(t('view'), 'admin/og/contact'));
+      }
+      break;
+    case 'delete':
+      if (og_is_group_type($node->type) == 1) {
+        db_query("DELETE FROM {og_contact} WHERE gid = %d", $node->nid);
+        drupal_set_message(t('The group contact form for %group has been deleted.', array('%group' => $node->title)));
+        watchdog('mail', 'OG Contact: Form for %group was deleted.', array('%group' => $node->title), WATCHDOG_NOTICE);
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_mail().
+ */
+function og_contact_mail($key, &$message, $params) {
+  $language = $message['language'];
+
+  $group = og_contact_group_load($params['gid']);
+
+  switch ($key) {
+    case 'page_mail':
+    case 'page_copy':
+      $contact = $params['contact'];
+
+      if (variable_get('og_contact_group_name_in_subject', 0)) {
+        $message['subject'] = t('[!groupname] !subject', array('!groupname' => $group->name, '!subject' => $params['subject']), $language->language);
+      }
+      else {
+        $message['subject'] = t('!subject', array('!subject' => $params['subject']), $language->language);
+      }
+      $message['body'][] = t("!name sent a message using the contact form at !form.", array('!name' => $params['name'], '!form' => url($_GET['q'], array('absolute' => TRUE, 'language' => $language))), $language->language);
+      $message['body'][] = $params['message'];
+      break;
+    case 'page_autoreply':
+      $contact = $params['contact'];
+      if (variable_get('og_contact_group_name_in_subject', 0)) {
+        $message['subject'] = t('[!groupname] !subject', array('!groupname' => $group->name, '!subject' => $params['subject']), $language->language);
+      }
+      else {
+        $message['subject'] = t('!subject', array('!subject' => $params['subject']), $language->language);
+      }
+      $message['body'][] = $group->reply;
+      break;
+  }
+}
+
+/**
+ * Generate an options array for form selects of groups that don't have
+ * contact forms.
+ */
+function og_contact_group_select_form_options() {
+  $groups = og_all_groups_options();
+  $options = array();
+  foreach ($groups as $gid => $name) {
+    if (!og_contact_group_has_form($gid)) {
+      $options[$gid] = $name;
+    }
+  }
+  return $options;
+}
+
+/**
+ * Check if group already has form
+ */
+function og_contact_group_has_form($gid) {
+  $query = db_query('SELECT COUNT(*) FROM {og_contact} WHERE gid=%d', $gid);
+  if (db_result($query) > 0) {
+    return TRUE;
+  }
+}
+
+/**
+ * Count the number of contact forms
+ */
+function og_contact_form_count() {
+  $form_count = db_result(db_query('SELECT COUNT(*) FROM {og_contact}'));
+  return $form_count;
+}
+/**
+ * Count the number of Organic Groups.
+ */
+function og_contact_og_count() {
+  $group_count = db_result(db_query('SELECT COUNT(*) FROM {og}'));
+  return $group_count;
+}
+
+/**
+ *  Check if a group contact form is private
+ */
+function og_contact_group_contact_private($gid) {
+  $private = db_result(db_query('SELECT notpublic FROM {og_contact} WHERE gid=%d', $gid));
+  if ($private == 1) {
+    return TRUE;
+  }
+}
+
+/**
+ *  Check if user can view private form
+ */
+function og_contact_can_view_contact($node) {
+  global $user;
+  $gid = $node->nid;
+  if (user_access('access og contact form')) {
+    if (og_contact_group_contact_private($gid) && og_is_group_member($gid, TRUE, $user->uid)) {
+      return TRUE;
+    }
+    elseif (!og_contact_group_contact_private($gid)) {
+      return TRUE;
+    }
+  }
+}
+
+/**
+ * Get group name from nid/gid
+ */
+function og_contact_get_group_name($gid) {
+  $name = db_result(db_query('SELECT title FROM {node} WHERE nid=%d', $gid));
+  return $name;
+}
+
+/**
+ * Format contact form recipient addresses
+ */
+function og_contact_get_recipients($gid)  {
+  // pull in recipients and recipient settings for the groups
+  $group_rules = db_fetch_object(db_query('SELECT noadmin,recipients,grouprecipients FROM {og_contact} WHERE gid=%d', $gid));
+
+  // get group admins when enabled
+  if ($group_rules->noadmin == 0) {
+    $admin_query = db_query('SELECT uid FROM {og_uid} WHERE nid=%d AND is_admin=1 AND is_active=1', $gid);
+    $admin_uids = array();
+    while ($admin = db_fetch_object($admin_query)) {
+      $admin_uids[$admin->uid] = $admin->uid;
+    }
+  }
+  // get group recipients when enabled
+  if ($group_rules->grouprecipients == 1) {
+    $group_uids = array();
+    $group_uids = og_contact_return_group_recipients($gid);
+  }
+
+  // build and array of user recipient uids
+  if (count($admin_uids) && count($group_uids)) {
+    $uids = array_merge($admin_uids, $group_uids);
+  }
+  elseif (count($admin_uids)) {
+    $uids = $admin_uids;
+  }
+  elseif (count($group_uids)) {
+    $uids = $group_uids;
+  }
+
+  // get each user recipients mail address
+  if (count($uids)) {
+    $i = 0;
+      foreach ($uids as $key => $uid) {
+        $mail = db_result(db_query('SELECT mail FROM {users} WHERE uid=%d', $uid));
+        // don't append a comma to the first address
+        // and don't append the address if its already in the recipients list
+        if ($i == 0 && !strstr($group_rules->recipients, $mail)) {
+          $mails = $mail;
+          $i++;
+        }
+        elseif (!strstr($group_rules->recipients, $mail)) {
+          $mails .= ', '. $mail;
+        }
+      }
+    // append group recipients when sent with other user recipients
+    if ($group_rules->recipients) {
+      $mails .= ','. $group_rules->recipients;
+    }
+  }
+  elseif ($group_rules->recipients) {
+    $mails = $group_rules->recipients;
+  }
+  return $mails;
+}
+
+/**
+ * Load OG Contact information about a group
+ */
+function og_contact_group_load($gid) {
+  // Load the group information:
+  $group = db_fetch_object(db_query("SELECT * FROM {og_contact} WHERE gid = %d", $gid));
+  $groupname = og_contact_get_group_name($gid);
+  $group->name = $groupname;
+  return $group;
+}
+
+/**
+ * Load a node object based on a menu arg
+ */
+function og_contact_group_node_load($arg) {
+  if (!is_numeric($arg)) {
+    return FALSE;
+  }
+  if ($node = node_load($arg)) {
+    if (og_is_group_type($node->type) && og_contact_group_has_form($node->nid)) {
+      return $node;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Menu argument callback for single admin pages
+ */
+function og_contact_admin_single_load($arg) {
+  if (!is_numeric($arg)) {
+    return FALSE;
+  }
+  if ($node = node_load($arg)) {
+    if (og_is_group_type($node->type) && variable_get('og_contact_group_admin_single', 1) == 1 && og_contact_group_has_form($node->nid)) {
+      return $node;
+    }
+  }
+  return FALSE;
+}
+/**
+ * Access callback for single admin pages
+ */
+function og_contact_can_edit_group_settings($node) {
+  global $user;
+  if (user_access('administer group contact form') && og_is_group_admin($node) || user_access('administer og contact form')) {
+    return TRUE;
+  }
+}
+/**
+ * Load contact form delete pages
+ */
+function og_contact_del_group_load($arg) {
+  if (!is_numeric($arg)) {
+    return FALSE;
+  }
+  if ($node = node_load($arg)) {
+    if (og_is_group_type($node->type) && og_contact_group_has_form($node->nid)) {
+      return $node->nid;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Check if a group has eligible non-admin recipients
+ */
+function og_contact_check_group_recipients($gid) {
+  $query = db_query('SELECT uid FROM {og_uid} WHERE nid=%d AND is_active=%d AND is_admin=%d', $gid, 1, 0);
+  $recipient_count = 0;
+  while ($uid = db_fetch_object($query)) {
+    if (user_access('receive og contact submissions', user_load($uid->uid))) {
+      $recipient_count++;
+    }
+  }
+  if ($recipient_count > 0) {
+    return TRUE;
+  }
+}
+
+/**
+ * Rerturn an array of group recipients
+ */
+function og_contact_return_group_recipients($gid) {
+  $query = db_query('SELECT uid FROM {og_uid} WHERE nid=%d AND is_active=%d AND is_admin=%d', $gid, 1, 0);
+  $users = array();
+  while ($uid = db_fetch_object($query)) {
+    if (user_access('receive og contact submissions', user_load($uid->uid))) {
+      $users[$uid->uid] = $uid->uid;
+    }
+  }
+  return $users;
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+// Commenting out for now until views integration is tightened up.
+// function og_contact_views_views_api() {
+//   return array(
+//     'api' => 2,
+//   );
+// }
