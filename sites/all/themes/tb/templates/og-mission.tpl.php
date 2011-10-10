@@ -3,8 +3,8 @@
   	<?php if($image): ?>
   		<div style="float: right; padding: 5px"><?php print $image; ?></div>
   	<?php endif; ?>
-  	<div style="font-size: 1.3em;"><span>Manager:<span> <?php print $manager; ?></div>
-  	<div style="font-size: 1.3em;"><span>Members:<span> <?php print $members; ?></div>
+  	<!--<div style="font-size: 1.3em;"><span>Coordinator:<span> <?php print $manager; ?></div>
+  	<div style="font-size: 1.3em;"><span>Members:<span> <?php print $members; ?></div>-->
   	<?php print $mission; ?>
   </div>
 <?php endif; ?>

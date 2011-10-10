@@ -51,7 +51,7 @@
  * @see template_preprocess_node()
  */
 ?>
-<div id="node-<?php print $node->nid; ?>" class="node<?php if ($sticky) { print ' sticky'; } ?><?php if (!$status) { print ' node-unpublished'; } ?> clear-block">
+<div id="node-<?php print $node->nid; ?>" class="<?php print $classes; ?> node<?php if ($sticky) { print ' sticky'; } ?><?php if (!$status) { print ' node-unpublished'; } ?> clear-block">
 
 <?php print $picture ?>
 
@@ -72,9 +72,9 @@
     <span class="submitted"><?php print $submitted ?></span>
   <?php endif; ?>
 
-  <?php if ($node->og_groups && !$page) {
-    print '<div class="links og-groups">'.  $og_links['view']. '</div>';
-   } ?>
+  <!-- <?php if ($node->og_groups && !$page) {
+      print '<div class="links og-groups">'.  $og_links['view']. '</div>';
+     } ?> -->
 
   <?php if ($terms): ?>
     <div class="terms terms-inline"><?php print $terms ?></div>
