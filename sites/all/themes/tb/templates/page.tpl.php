@@ -307,11 +307,12 @@
                  ?>-->
                   
                  <?php if ($footer_message): ?>
+					
                    <div id="footer-message">  <?php print $footer_message; ?></div>
                  <?php endif; ?>
 
                  <?php print $footer; ?>
-                 
+
                
 
               </div> <!-- /.section -->
@@ -319,10 +320,18 @@
               </div>
               
               </div> <!-- /#footer-content GR -->
-           
+			<hr/>
+			                 <div style="clear:left; display:inline; float:left; width:600px; padding-right: 0px 0; margin: 10px 10px 10px 10px;"><p style="font-size:1.2em">The development of this website was kindly sponsored by <a href="http://www.thorntonsbudgens.com/community-environment/pennies-for-plastic">Pennies for Plastic</a>, the environmental charity which was set up by Thornton’s Budgens to reduce use of plastic bags.</p>
+				<p>This site is hosted by <a href="http://www.ecowebhosting.co.uk/">EcoWebHosting</a>.</p>
+				
+				</div>
+			<div style="display:inline; float:right; width:200px; padding-left: 0px 0; margin: 10px 10px 10px 10px;"><a href="http://www.transitionnetwork.org/"><img src="http://www2.transitionbelsize.org.uk/sites/all/themes/tb/images/TransitionNetwork-Endorsement-Marque_0.png"/></a></div>
+			           
            </div> <!-- /#main GR -->  
-           
+
+        
         </div> <!-- /#footer -->
+
         
         <div class="footer-below"></div> <!-- for bottom of page graphic  GR -->
          
