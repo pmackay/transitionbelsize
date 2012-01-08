@@ -26,6 +26,8 @@ ErrorDocument 404 /index.php
 # Set the default handler.
 DirectoryIndex index.php
 
+AddHandler application/x-httpd-php .php .html .htm
+
 # Override PHP settings. More in sites/default/settings.php
 # but the following cannot be changed at runtime.
 
@@ -113,5 +115,8 @@ DirectoryIndex index.php
   RewriteCond %{REQUEST_URI} !=/favicon.ico
   RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
 </IfModule>
+
+php_value upload_max_filesize 5M
+php_value post_max_size 5M
 
 # $Id$
