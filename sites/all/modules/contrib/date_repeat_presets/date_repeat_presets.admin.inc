@@ -1,5 +1,4 @@
 <?php
-// $Id: date_repeat_presets.admin.inc,v 1.1 2010/11/13 23:17:10 chaps2 Exp $
 /**
  * @file
  * Administration of repeat rule presets.
@@ -100,7 +99,7 @@ function _date_repeat_presets_admin_form_alter(&$form, &$form_state, $form_id) {
         '#type' => 'textfield',
         '#default_value' => isset($preset_storage['rrule']) ? $preset_storage['rrule'] : $preset['rrule'],
         '#title' => t('Rrule'),
-        '#description' => t('Enter valid RRULES to offer as preset repeat rules on the repeating date field. Include an X-ID in the RRULE to allow updated RRULEs to match to previous versions.'),
+        '#description' => t('Enter valid iCalendar recurrence rules (RRULES) to offer as preset repeat rules on the repeating date field. Include an X-ID in the RRULE to allow updated RRULEs to match to previous versions. For the RRULE specification see !url.', array('!url' => l('RFC-5545', 'http://tools.ietf.org/html/rfc5545#section-3.8.5.3', array('external' => TRUE)))),
       );
       $preset = next($presets);
     }
@@ -133,6 +132,7 @@ function _date_repeat_presets_admin_form_alter(&$form, &$form_state, $form_id) {
       '#type' => 'textfield',
       '#title' => t('Rule to apply'),
       '#default_value' => isset($auto_storage['rrule']) ? $auto_storage['rrule'] : $settings['auto']['rrule'],
+      '#description' => t('A valid iCalendar recurrence rule (RRULE). See !url.', array('!url' => l('RFC-5545', 'http://tools.ietf.org/html/rfc5545#section-3.8.5.3', array('external' => TRUE)))),
     );
     $form['field']['repeat_presets']['auto']['optional'] = array(
       '#type' => 'checkbox',
@@ -239,7 +239,7 @@ function theme_date_repeat_presets_presets($form) {
   }
 
 
-  $output = '<div class="form-item"><label>'. $form['#title'] .':<label>';
+  $output = '<div class="form-item"><label>'. $form['#title'] .':</label>';
   $output .= theme('table', $headers, $rows, array('id' => 'date-repeat-presets-admin-presets-table'));
 
 

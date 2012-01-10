@@ -1,4 +1,3 @@
-$Id: README.txt,v 1.1 2010/11/13 23:17:10 chaps2 Exp $
 
 ## SUMMARY ##
 

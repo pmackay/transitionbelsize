@@ -1,5 +1,4 @@
 <?php
-// $Id: date_repeat_presets.inc,v 1.1 2010/11/13 23:17:10 chaps2 Exp $
 
 /**
  * @file
@@ -19,120 +18,122 @@
  */
 function _date_repeat_presets_alter_node_form(&$form, &$form_state) {
   static $once = FALSE;
-  // Find any repeating date fields.
-  foreach ($form['#field_info'] as $field_name => $field_info) {
 
-    if (date_is_repeat_field($field_info)) {
-      // get settings - default or set via widget settings form
-      $settings = _date_repeat_presets_get_settings($field_info);
+  if(!empty($form['#field_info'])) {
+    // Find any repeating date fields.
+    foreach ($form['#field_info'] as $field_name => $field_info) {
 
-      if ($settings['type'] == 'selection') {
-        $presets = $settings['preset'];
+      if (date_is_repeat_field($field_info)) {
+        // get settings - default or set via widget settings form
+        $settings = _date_repeat_presets_get_settings($field_info);
 
-        // Repeat options array
-        $options = array();
+        if ($settings['type'] == 'selection') {
+          $presets = $settings['preset'];
 
-        // Offer a no repeat option.
-        $options['none'] = t('No repeat');
+          // Repeat options array
+          $options = array();
 
-        // Get the parts of the set rule to get and match any X-ID element
-        $set_rrule_values = _date_repeat_presets_parse_rrule($form[$field_name]['rrule']['#default_value']);
+          // Offer a no repeat option.
+          $options['none'] = t('No repeat');
 
-        // Default preset to none in case no matching rule found
-        $default = 'none';
-        foreach ($presets as $id => $preset) {
-          if ($preset['enabled'] && !empty($preset['rrule']) && !empty($preset['title'])) {
-            // Add form element option
-            $options[$id] = t($preset['title']);
+          // Get the parts of the set rule to get and match any X-ID element
+          $set_rrule_values = _date_repeat_presets_parse_rrule($form[$field_name]['rrule']['#default_value']);
 
-            // Parse the preset option rrule to see if it has same id as current setting
-            $values = _date_repeat_presets_parse_rrule($preset['rrule']);
+          // Default preset to none in case no matching rule found
+          $default = 'none';
+          foreach ($presets as $id => $preset) {
+            if ($preset['enabled'] && !empty($preset['rrule']) && !empty($preset['title'])) {
+              // Add form element option
+              $options[$id] = t($preset['title']);
 
-            // If preset rule matches current rule - make this preset selected.
-            if ($preset['rrule'] == $form[$field_name]['rrule']['#default_value']) {
-              $default = $id;
+              // Parse the preset option rrule to see if it has same id as current setting
+              $values = _date_repeat_presets_parse_rrule($preset['rrule']);
+
+              // If preset rule matches current rule - make this preset selected.
+              if ($preset['rrule'] == $form[$field_name]['rrule']['#default_value']) {
+                $default = $id;
+              }
+              // Otherwise if X-ID of preset rule matches X-ID of current rule - make this preset selected.
+              elseif ($set_rrule_values['X-ID'][0] == $values['X-ID'][0]) {
+                $default = $id;
+              }
             }
-            // Otherwise if X-ID of preset rule matches X-ID of current rule - make this preset selected.
-            elseif ($set_rrule_values['X-ID'][0] == $values['X-ID'][0]) {
-              $default = $id;
+          }
+
+          $weight = $form[$field_name]['rrule']['#weight'] - .1;
+
+          // Handle custom rrule option.
+          if ($settings['allow_custom']) {
+            // Add option to form element.
+            $options['custom'] = t('Custom');
+
+            // If there is a rule set which does not match any presets then mark the custom option as selected.
+            if (!empty($form[$field_name]['rrule']['#default_value']) && $default === 'none')  {
+              $default = 'custom';
             }
+
+            // Add javascript to show/hide the custom form when custom option is selected/deselected.
+            if (!$once) {
+              drupal_add_js(drupal_get_path('module', 'date_repeat_presets') . '/date_repeat_presets.js');
+              $once = TRUE;
+            }
+          }
+          else {
+            // if custom is not an option then we don't need the fieldset.
+            unset($form[$field_name]['rrule']['#type']);
+          }
+
+          // Add preset selection to form either as radios or select box depending on settings.
+          $form[$field_name]['rrule']['rrule_presets'] = array(
+            '#type' => $settings['preset_ui'],
+            '#title' => t('Repeat'),
+            '#options' => $options,
+            '#default_value' => $default,
+            '#weight' => -1,
+            '#date_repeat_presets_field' => TRUE,
+            '#attributes' => array('class' => 'drp-presets-' . $field_name),
+          );
+
+
+          // need to do some after build manipulation on the expanded rrule form element.
+          $form[$field_name]['#after_build'][] = 'date_repeat_presets_after_build';
+
+          if (!empty($js_settings)) {
+            // hide/show custom options
+            // drupal_add_js(drupal_get_path('module', 'date_repeat_presets') . '/date_repeat_presets.js');
+            // drupal_add_js(array('date_repeat_presets' => array('fields' => $js_settings)), 'setting');
           }
         }
+        elseif ($settings['type'] == 'single') {
+          // dpm($form[$field_name]['rrule']);
 
-        $weight = $form[$field_name]['rrule']['#weight'] - .1;
+          // set up the form for single rule with optional apply checkbox
+          // $form[$field_name]['rrule']['#type'] = 'hidden';
+          // $form[$field_name]['rrule']['#processed'] = TRUE;
 
-        // Handle custom rrule option.
-        if ($settings['allow_custom']) {
-          // Add option to form element.
-          $options['custom'] = t('Custom');
+          $weight = $form[$field_name]['rrule']['#weight'] - .1;
 
-          // If there is a rule set which does not match any presets then mark the custom option as selected.
-          if (!empty($form[$field_name]['rrule']['#default_value']) && $default === 'none')  {
-            $default = 'custom';
+          if ($settings['auto']['optional']) {
+            $form[$field_name]['rrule']['rrule_apply'] = array(
+              '#type' => 'checkbox',
+              '#title' => t($settings['auto']['text']),
+              '#default_value' => !empty($form[$field_name]['rrule']['#default_value']),
+              '#weight' => $weight,
+              '#date_repeat_presets_field' => TRUE,
+            );
           }
 
-          // Add javascript to show/hide the custom form when custom option is selected/deselected.
-          if (!$once) {
-            drupal_add_js(drupal_get_path('module', 'date_repeat_presets') . '/date_repeat_presets.js');
-            $once = TRUE;
-          }
+          unset($form[$field_name]['rrule']['#type']);
+
+          // need to do some after build manipulation on the expanded rrule form element.
+          $form[$field_name]['#after_build'][] = 'date_repeat_presets_after_build';
         }
         else {
-          // if custom is not an option then we don't need the fieldset.
-          unset($form[$field_name]['rrule']['#type']);
+          // standard - do nothing
         }
-
-        // Add preset selection to form either as radios or select box depending on settings.
-        $form[$field_name]['rrule']['rrule_presets'] = array(
-          '#type' => $settings['preset_ui'],
-          '#title' => t('Repeat'),
-          '#options' => $options,
-          '#default_value' => $default,
-          '#weight' => -1,
-          '#date_repeat_presets_field' => TRUE,
-          '#attributes' => array('class' => 'drp-presets-' . $field_name),
-        );
-
-
-        // need to do some after build manipulation on the expanded rrule form element.
-        $form[$field_name]['#after_build'][] = 'date_repeat_presets_after_build';
-
-        if (!empty($js_settings)) {
-          // hide/show custom options
-          // drupal_add_js(drupal_get_path('module', 'date_repeat_presets') . '/date_repeat_presets.js');
-          // drupal_add_js(array('date_repeat_presets' => array('fields' => $js_settings)), 'setting');
-        }
-      }
-      elseif ($settings['type'] == 'single') {
-        // dpm($form[$field_name]['rrule']);
-
-        // set up the form for single rule with optional apply checkbox
-        // $form[$field_name]['rrule']['#type'] = 'hidden';
-        // $form[$field_name]['rrule']['#processed'] = TRUE;
-
-        $weight = $form[$field_name]['rrule']['#weight'] - .1;
-
-        if ($settings['auto']['optional']) {
-          $form[$field_name]['rrule']['rrule_apply'] = array(
-            '#type' => 'checkbox',
-            '#title' => t($settings['auto']['text']),
-            '#default_value' => !empty($form[$field_name]['rrule']['#default_value']),
-            '#weight' => $weight,
-            '#date_repeat_presets_field' => TRUE,
-          );
-        }
-
-        unset($form[$field_name]['rrule']['#type']);
-
-        // need to do some after build manipulation on the expanded rrule form element.
-        $form[$field_name]['#after_build'][] = 'date_repeat_presets_after_build';
-      }
-      else {
-        // standard - do nothing
       }
     }
   }
-
 
   return $form;
 }

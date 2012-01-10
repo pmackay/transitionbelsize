@@ -1,0 +1,23 @@
+
+/**
+ * @file
+ * INSTALL file for jUpload for Imagefield.
+ */
+
+1. Untar the module into your modules directory, usually sites/all/modules
+
+2. Enable the module at admin/build/modules
+
+3. Create a multiple-value imagefield (maximum number of values greater than 1)
+   and assign it to a content type.
+
+3. Adjust the module's settings at admin/settings/jifupload
+   Select the content types and fields where you want to use the uploader.
+   Enter any additional parameters for the uploader.
+
+4. If you wish to use Tokens in your file save locations, you will need to
+   install the filefield_paths module.
+
+5. Recommended modules include: imagecache, token and filefield_paths.
+
+6. Support for the module is available in the project's issue queue.

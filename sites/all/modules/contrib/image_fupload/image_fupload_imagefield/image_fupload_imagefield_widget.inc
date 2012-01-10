@@ -142,6 +142,6 @@ function _image_fupload_previewlist_captions($node_type, $field_name) {
 /**
  * FormAPI theme function. Theme the output of an image field.
  */
-function theme_image_fupload_imagefield_widget(&$element) {
+function theme_image_fupload_imagefield_widget($element) {
   return theme('form_element', $element, $element['#children']);
 }

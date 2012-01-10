@@ -1,4 +1,3 @@
-// $Id: date_repeat_presets.js,v 1.1 2010/11/13 23:17:10 chaps2 Exp $
 
 Drupal.behaviors.date_repeat_presets = function(context) {
   $('.date-repeat-presets-custom').each(function() {

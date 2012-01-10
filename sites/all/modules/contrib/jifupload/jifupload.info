@@ -1,0 +1,12 @@
+name = jifUploader for Imagefield
+description = "Multiple images are automatically populated to a multi-value imagefield using the wjhk.jupload Java uploader applet."
+package = CCK
+dependencies[] = imagefield
+core = 6.x
+version = 6.x-6-dev
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "jifupload"
+datestamp = "1298619493"
+

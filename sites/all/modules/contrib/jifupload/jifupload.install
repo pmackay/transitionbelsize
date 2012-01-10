@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Install file for the jifupload module.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function jifupload_uninstall() {
+   db_query("DELETE from {variable} WHERE name LIKE '%s%%'", 'jifupload_');
+}

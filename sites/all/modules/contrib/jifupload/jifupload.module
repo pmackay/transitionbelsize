@@ -1,0 +1,216 @@
+<?php
+
+/**
+ * @file
+ * The jifupload module, which allow batch uploading to multiple-value
+ * imagefield cck fields.
+ *
+ * The module integrates the jupload Java uploader with the content module
+ * using filefield and imagefield.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function jifupload_menu() {
+  $items['admin/settings/jifupload'] = array(
+    'title' => t('JIFUpload'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jifupload_admin_settings'),
+    'access arguments' => array('administer jifupload'),
+    'type' => MENU_NORMAL_ITEM,
+    'description' => t('Change settings for the jifUpload module.'),
+    'file' => 'jifupload.admin.inc',
+  );
+  $items['jifupload/%/%/%'] = array(
+    'page callback' => 'jifupload_upload',
+    'page arguments' => array(1, 2, 3),
+    'access callback' => 'jifupload_edit_access',
+    'access arguments' => array(3),
+    'type' => MENU_CALLBACK,
+    'file' => 'jifupload.upload.inc',
+  );
+
+  // Callback for setting return path when we create a new node.
+  $items['jifupload/returnpath/%'] = array(
+    'page callback' => 'jifupload_returnpath',
+    'access callback' => 'jifupload_edit_access',
+    'access arguments' => array(2),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function jifupload_perm() {
+  return array('administer jifupload', 'access jifupload');
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function jifupload_form_alter(&$form, $form_state, $form_id) {
+
+  if ($form['type']['#value'] .'_node_form' == $form_id && jifupload_types($form['type']['#value']) == 'TRUE') {
+    if ($fields = _jifupload_fields($form['type']['#value'])) {
+      // If we are editing a node we set the return path to the edit form.
+      if (isset($form['nid']['#value'])) {
+        $returnpath = base_path() . drupal_get_path_alias($_GET['q']);
+        $node->nid = $form['nid']['#value'];
+      }
+
+      // We are creating a new node. We set nid to 0 and the return path to our
+      // menu callback function where we get a real nid and then drupal_goto()
+      //  the edit page.
+      else {
+        $node->nid = 0;
+        $returnpath = base_path() .'jifupload/returnpath/'. $fields[0];
+      }
+      $uploadpath = base_path() .'jifupload/'. $form['type']['#value'] .'/'. $fields[0] .'/'. $node->nid;
+
+      // Copying the form id to form name, which is used by the applet.
+      // jupload 4.2 doesn't like underscores in the form name.
+      $new_form_id = 'jifuploadform';
+      $form['#attributes'] = array('name' => $new_form_id);
+
+      $form['applet'] = array(
+      '#type' => 'item',
+      '#title' => $form[$fields[0]]['#title'] .': '. t('Click Browse to select
+                  multiple images, or drag-and-drop them to the space below. <br />
+                  The page will refresh when uploads are complete'),
+      '#value' => jifupload_appconfig($uploadpath, $returnpath, $new_form_id),
+      '#access' => user_access('access jifupload'),
+      '#description' => implode('<br />', jifupload_get_filefield_descriptions($fields[0])),
+      '#prefix' => '<div id="'. $fields[0] .'-applet">',
+      '#suffix' => '</div>',
+      '#weight' => intval($form[$fields[0]]['#weight']) - 0.01,
+      );
+    }
+  }
+}
+
+/**
+ * Returns the description that filefield generates for the field to which this jupload widget is attached.
+ *
+ * @param string The name of the field to which this jupload widget is attached.
+ * @return array An array containing the descriptions.
+ */
+function jifupload_get_filefield_descriptions($field_name) {
+  foreach (filefield_widget_upload_validators(content_fields($field_name)) as $callback => $arguments) {
+    $help_func = $callback .'_help';
+    if (function_exists($help_func)) {
+      $description[] = call_user_func_array($help_func, $arguments);
+    }
+  }
+  return $description;
+}
+
+function _jifupload_fields($current_type) {
+  $content_types = array();
+  $fields = array();
+  if (!$content_types = variable_get('jifupload_node_types', '')) {
+    return;
+  }
+  if (!$field_types = variable_get('jifupload_field_types', '')) {
+    return;
+  }
+  // Run through the fields and see what matches our current content type.
+  foreach ($content_types as $type) {
+    if ($type == $current_type) {
+      foreach ($field_types as $field) {
+        $multiple = content_fields($field, $type);
+        if ($multiple['multiple'] != 0) {
+          $fields[] = $field;
+        }
+      }
+    }
+  }
+  return $fields;
+}
+
+function jifupload_returnpath() {
+  // The new node has just been saved after image uploading. Now we need to find
+  // that node, so we look for the newest node created by the current user, and
+  //end the browser to that node's edit page.
+  global $user;
+  $result = db_query_range(db_rewrite_sql("SELECT n.nid, n.uid, n.created FROM {node} n
+WHERE n.uid = %d
+ORDER BY n.created DESC"), $user->uid, 0, 1);
+  $nid = db_fetch_object($result)->nid;
+  drupal_goto('node/'. $nid .'/edit');
+}
+
+// Because drupal doesn't have native recursive directory creation, we add this
+// funtcion to do it. See http://drupal.org/node/270443
+function jifupload_file_check_directories($path, $mode = 0, $form_item = NULL, $temp = FALSE) {
+  $dirs = array(($temp) ? file_directory_temp() : file_directory_path());
+  foreach (array_filter(explode('/', trim($path, '/'))) as $dir) {
+    $dir = trim($dir);
+    if ($dir == '..' || $dir == '.') {
+      continue;
+    }
+    $dirs[] = $dir;
+    $path = file_create_path(implode($dirs, '/'));
+    $result = file_check_directory($path, $mode, $form_item);
+    if (!$result) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+function jifupload_appconfig($uploadpath, $returnpath, $new_form_id) {
+  $height =      variable_get('jifupload_applet_height', '400');
+  $width =        variable_get('jifupload_applet_width', '650');
+  $codebase =     base_path() . drupal_get_path('module', 'jifupload');
+  $maxfilesize =  (variable_get('jifupload_maxfilesize', 0) > 0) ? round(1024*1024*variable_get('jifupload_maxfilesize', 0)) : -1; // Convert from MB to bytes.
+  //  $maxtotalsize = (variable_get('jifupload_maxtotalsize', 0) != 0) ? 1024*1024/variable_get('jifupload_maxtotalsize', 0) : 0; // Convert from MB to bytes.
+  //  $maxfilecount = variable_get('jifupload_maxfilecount', 0);
+  $params =       jifupload_clean_params(variable_get('jifupload_params', ''));
+
+  $value = '<applet code="wjhk.jupload2.JUploadApplet" name="JUpoload" archive="'. $codebase .'/wjhk.jupload.jar" width="'. $width .'" height="'. $height .'" mayscript alt="" >
+            <param name="formdata" value="'. $new_form_id .'" />
+            <param name="postURL" value="'. $uploadpath .'" />
+            <param name="uploadPolicy" value="PictureUploadPolicy" />
+            <param name="afterUploadURL" value="'. $returnpath .'" />
+            <param name="nbFilesPerRequest" value="-1" />
+            <param name="maxFileSize" value="'. $maxfilesize .'" />
+            <param name="showLogWindow" value="false"/>
+            <param name="debugLevel" value="0" />
+            <param name="lookAndFeel" value="system" />
+            <param name="showSuccessDialog" value="false">
+            '. $params .'
+            Java 1.5 or higher plugin required.
+            </applet>';
+  return $value;
+}
+
+// Check plain and format additional user-entered applet parameters.
+function jifupload_clean_params($params) {
+  parse_str(str_replace("\n", '&', (check_plain($params))), $array);
+  foreach ($array as $key => $value) {
+    $clean_params .= '<param name="'. $key .'" value="'. str_replace("\r", '', $value) .'"/>'."\n";
+  }
+  return $clean_params;
+}
+
+function jifupload_edit_access($field_name) {
+  //  if (module_exists('content_permissions')) {
+  //    return user_access('edit '. $field_name);
+  //  }
+  // For now, we use access content because when jupload loads it makes an
+  // anonymous request to the upload page.
+  // This low-level permission prevents an access denied from being logged.
+  // For security, the upload page first checks for empty $_FILES or $_POST and
+  // does nothing if either is empty. What to do for private sites??
+  return user_access('access content');
+}
+function jifupload_types($type) {
+  $jifupload_types = variable_get('jifupload_node_types', array(''));
+  if (in_array($type, $jifupload_types, TRUE)) {
+    return 'TRUE';
+  }
+  return 'FALSE';
+}
