@@ -1,0 +1,26 @@
+diff --git a/image_fupload_imagefield/image_fupload_imagefield.module b/image_fupload_imagefield/image_fupload_imagefield.module
+index e531bad..c3ea273 100644
+--- a/image_fupload_imagefield/image_fupload_imagefield.module
++++ b/image_fupload_imagefield/image_fupload_imagefield.module
+@@ -477,7 +477,7 @@ function image_fupload_imagefield_widget_settings($op, $widget) {
+  * Assign default properties to item and delegate to filefield.
+  */
+ function image_fupload_imagefield_widget($form, $form_state, $field, $items, $delta = 0) {
+-  $element = module_invoke('imagefield', 'widget', $form, $form_state, $field, $items, $delta);
++  $element = call_user_func('imagefield_widget', &$form, &$form_state, $field, $items, $delta);
+   return $element;
+ }
+ 
+diff --git a/image_fupload_imagefield/image_fupload_imagefield_widget.inc b/image_fupload_imagefield/image_fupload_imagefield_widget.inc
+index 3f26df9..a32b87d 100644
+--- a/image_fupload_imagefield/image_fupload_imagefield_widget.inc
++++ b/image_fupload_imagefield/image_fupload_imagefield_widget.inc
+@@ -142,6 +142,6 @@ function _image_fupload_previewlist_captions($node_type, $field_name) {
+ /**
+  * FormAPI theme function. Theme the output of an image field.
+  */
+-function theme_image_fupload_imagefield_widget(&$element) {
++function theme_image_fupload_imagefield_widget($element) {
+   return theme('form_element', $element, $element['#children']);
+ }
+\ No newline at end of file
