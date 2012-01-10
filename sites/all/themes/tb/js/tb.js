@@ -8,10 +8,10 @@ Drupal.behaviors.tb = function(context) {
       .find('.section .navCenter')
       .hover(
         function() {
-          $nav.height(200);
+          $nav.height(300);
         }, 
         function() {
-          $nav.animate({height: originalHeight+'px'}, 600);
+          $nav.animate({height: originalHeight+'px'}, 300);
         }
       );
     

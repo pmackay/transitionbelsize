@@ -14,7 +14,9 @@
 }
 
 .field-item {
-  margin-right: 5px;
+  margin-right: 20px;
+  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
 .field-type-datetime /* Always use "datetime" when creating new CCK date fields. "date" and "datestamp" are legacy types. */ {

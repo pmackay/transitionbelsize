@@ -93,14 +93,18 @@
    <?php print $content; ?>
   </div>
 
+<?php if($page): ?>
   <div class="meta">
   <?php if ($node->og_groups && !$page) {
     print '<div class="links og-groups">'.  $og_links['view']. '</div>';
    } ?>
   <?php if ($terms): ?>
     <div class="terms terms-inline"><?php print $terms ?></div>
-  <?php endif;?>
+  <?php endif;?>  
   </div>
+<?php endif;?>
 
-  <?php print $links; ?>
+  <?php if($page): ?>
+    <?php print $links; ?>
+  <?php endif;?>
 </div>

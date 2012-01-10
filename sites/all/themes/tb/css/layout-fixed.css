@@ -130,7 +130,7 @@ body {
 	margin: 0;
   padding: 0;
   text-align: left; /* LTR */
-	font-size: 1.1em; /* GR */
+	font-size: 12pt; /* GR */
 }
 
 #navigation li /* A simple method to get navigation links to appear in one line. */ {
@@ -199,7 +199,6 @@ body {
   overflow: visible;
   word-wrap: break-word; /* A very nice CSS3 property */
 }
-
 
 #navigation {
   overflow: hidden; /* May need to be removed if using a dynamic drop-down menu */

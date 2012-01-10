@@ -37,7 +37,7 @@ body ul.links-foot li a {
 /* main navigation */
 
 .navLeft {
-	background-image: url("../images/nav_bg_left.png"); width:30px;
+	background-image: url("../images/nav_bg_left.png"); width:50px;
 	float: left;
 	height: 51px;
 	width: 20px;
@@ -52,14 +52,14 @@ body ul.links-foot li a {
 }
 
 .navRight {
-	background-image:url("../images/nav_bg_right.png"); width:30px;
+	background-image:url("../images/nav_bg_right.png"); width:50px;
 	float: left;
 	height: 51px;
 	width: 15px;
 }
 
 .navigation a {
-	font-size: 3em;
+	font-size: 1em;
 }
 
 /* sidebar */
@@ -118,7 +118,7 @@ body.page-events .view-content thead a {
 }
 
 body.page-events .view-content tbody a {
-	color: #757080;	
+/*	color: #757080;	*/
 }
 
 body.page-events .view-content tbody a:hover {
@@ -126,7 +126,7 @@ body.page-events .view-content tbody a:hover {
 }
 
 body.page-events .view-content table, th, tr, td, tr.even, tr.odd {
-	background-color: none;
+	background-color: transparent;
 /*	font-family: georgia, serif;*/
 	font-size:10pt;
 	width:630px;
@@ -147,7 +147,7 @@ body.page-events .view-content tr.even, tr.odd {
 }
 
 body.page-events .view-content td.active {
-    background-color: none;
+    background-color: transparent;
 }
 
 
@@ -204,11 +204,12 @@ body.page-events .view-content th.views-field- {
 /* group index tables */
 
 body.page-og .view-content table, th, tr, td, tr.even, tr.odd {
-	background-color: none;
+	background-color: transparent;
 /*	font-family: georgia, serif;*/
 	font-size:10pt;
-	width:630px;
+	width: 630px;
 	vertical-align:top;
+	padding: 5px;
 }
 
 body.page-og .view-content thead a {
@@ -226,7 +227,7 @@ body.page-og .view-content tbody a:hover {
 }
 
 body.page-og .view-content tr.even, tr.odd {
-  background-color: none;
+  background-color: transparent;
   border-bottom: 1px dotted gray;
 }
 
@@ -290,8 +291,8 @@ body.section-event .groups ul.links li a:hover {
   float: left;
 }
 
-.event-details p {
-  font-size: 1.3em;
+.event-details * {
+  font-size: 1.1em;
 }
 
 .node-type-event form#signup-form, .signup_anonymous_login {
@@ -299,20 +300,40 @@ body.section-event .groups ul.links li a:hover {
 }
 
 .node-type-event .field-field-image {
-  float: right;
-  padding-left: 4px;
+  float: left;
+  margin-bottom: 10px;
+  margin-right: 20px;
+  margin-top: 5px;
 }
 
-.field-field-image img.imagecache-event_teaser {
+.node-type-gallery .imagecache-event_thumb {
+  float: left;
+  margin-bottom: 10px;
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+/*.field-field-image img.imagecache-event_teaser {
   float: right;
   margin-left: 4px;
+}*/
+
+.view-upcoming-events-promoted .imagecache-event_thumb {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 10px;
 }
 
 .imagecache-event_thumb img, .imagecache-event_node img, img.imagecache-event_thumb ,img.imagecache-event_node, img.imagecache-event_teaser, img.imagecache-event_view {
   -webkit-box-shadow: 0px 0px 4px #b86f4f;
   -moz-box-shadow: 0px 0px 4px #b86f4f;
   box-shadow: 0px 0px 4px #b86f4f;
-  margin-top: 4px;
+  margin: 6px;
+  margin-right: 0px;
+}
+
+.views-field-field-image-fid > .imagecache-event_thumb img, .imagecache-event_node img, img.imagecache-event_thumb ,img.imagecache-event_node, img.imagecache-event_teaser, img.imagecache-event_view {
+  margin: 0px;
 }
 
 .node-type-event ul.links li {
@@ -345,8 +366,8 @@ body.section-event .groups ul.links li a:hover {
 }
 
 .event-map iframe {
-  width: 370px;
-  height: 150px;
+  width: 350px;
+  height: 180px;
   -webkit-box-shadow: 0px 0px 2px #b86f4f;
   -moz-box-shadow: 0px 0px 2px #b86f4f;
   box-shadow: 0px 0px 2px #b86f4f;
@@ -692,7 +713,15 @@ ul.links li.sharethis_link {
 }
 
 .node-type-news * div.field-field-image .field-items .field-item {
-	float: right;
+	float: left;
+}
+
+.node-type-project * div.field-field-image .field-items .field-item {
+	float: left;
+}
+
+.node-type-event * div.field-field-image .field-items .field-item {
+	float: left;
 }
 
 /* Fix some formatting issues on the new account page. */
@@ -706,5 +735,9 @@ ul.links li.sharethis_link {
 
 .field-field-address > .field-label {
 	display:none
+}
+
+.front * .breadcrumb {
+    display: none;
 }
 

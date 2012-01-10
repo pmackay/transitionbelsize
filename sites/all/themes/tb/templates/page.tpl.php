@@ -325,7 +325,7 @@
 				<p>This site is hosted by <a href="http://www.ecowebhosting.co.uk/">EcoWebHosting</a>.</p>
 				
 				</div>
-			<div style="display:inline; float:right; width:200px; padding-left: 0px 0; margin: 10px 10px 10px 10px;"><a href="http://www.transitionnetwork.org/"><img src="http://www2.transitionbelsize.org.uk/sites/all/themes/tb/images/TransitionNetwork-Endorsement-Marque_0.png"/></a></div>
+			<div style="display:inline; float:right; width:200px; padding-left: 0px 0; margin: 10px 10px 10px 10px;"><a href="http://www.transitionnetwork.org/"><img src="http://www.transitionbelsize.org.uk/sites/all/themes/tb/images/TransitionNetwork-Endorsement-Marque_0.png"/></a></div>
 			           
            </div> <!-- /#main GR -->  
 

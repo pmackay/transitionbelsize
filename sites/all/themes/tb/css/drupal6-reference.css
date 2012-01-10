@@ -1182,18 +1182,18 @@ th.active img {
   display: inline;
 }
 tr.even, tr.odd {
-  background-color: #eee;
+  background-color: transparent;
   border-bottom: 1px solid #ccc;
   padding: 0.1em 0.6em;
 }
 tr.drag {
-  background-color: #fffff0;
+/*  background-color: #fffff0;*/
 }
 tr.drag-previous {
-  background-color: #ffd;
+/*  background-color: #ffd;*/
 }
 td.active {
-  background-color: #ddd;
+  background-color: transparent;
 }
 td.checkbox, th.checkbox {
   text-align: center;
