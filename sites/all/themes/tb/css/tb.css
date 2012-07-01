@@ -724,6 +724,10 @@ ul.links li.sharethis_link {
 	float: left;
 }
 
+.node-type-gallery * div.field-field-images .field-items .field-item {
+	float: left;
+}
+
 /* Fix some formatting issues on the new account page. */
 .wysiwyg > ul.tips {
 	display:none

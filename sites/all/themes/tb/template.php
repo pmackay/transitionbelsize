@@ -224,6 +224,7 @@ function tb_preprocess_node_event(&$vars, $hook) {
   $vars['image'] = $img_output;
 }
 
+/*
 function tb_preprocess_node_gallery(&$vars, $hook) {
   if($vars['teaser']) {
     $path = $vars['field_images'][0]['filepath'];
@@ -233,6 +234,8 @@ function tb_preprocess_node_gallery(&$vars, $hook) {
     $vars['content'] = $output;
   }
 }
+*/
+
 /**
  * Override or insert variables into the comment templates.
  *
